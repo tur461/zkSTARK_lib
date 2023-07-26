@@ -1,0 +1,30 @@
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
+use std::mem::replace;
+use std::time::{Duration, Instant};
+
+// Calculate large fibonacci numbers.
+fn fib_sq(n: usize) -> BigUint {
+    let mut f0: BigUint = Zero::zero();
+    let mut f1: BigUint = One::one();
+    for _ in 0..n {
+        let f2 = f0.pow(2) + &f1.pow(2);
+        // This is a low cost way of swapping f0 with f1 and f1 with f2.
+        f0 = replace(&mut f1, f2);
+    }
+    f0
+}
+
+fn main() {
+    //let mut ip = String::new();
+    //std::io::stdin().read_line(&mut ip).expect("a num");
+    //let ip = ip.trim().parse::<usize>().unwrap();
+
+    //let result: Vec<BigUint> = (1..ip).into_iter().map(|n| fib_sq(n)).collect();
+
+    //println!("Result {:?}", result);
+    let start = Instant::now();
+    let r = fib_sq(1023);
+    println!("Found 1023th term: {} in {:?}", r, start.elapsed());
+}
+
