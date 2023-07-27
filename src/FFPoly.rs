@@ -50,7 +50,7 @@ impl FFPoly {
 
     fn rm_trailing_with(v: &[FFieldUnit], w: &FFieldUnit) -> Vec<FFieldUnit> {
         let mut res = v.to_vec();
-        while let Some(&l) = v.last() {
+        while let Some(&l) = res.last() {
             if l == w.clone() {
                 res.pop();
             } else {
@@ -145,11 +145,14 @@ impl Sub<FFPoly> for FFPoly {
         } else {
             (other, self.clone())
         };
+        // we can make utility fn out of this
+        let result: Vec<FFieldUnit> = longer
+            .coeffs
+            .iter()
+            .enumerate()
+            .map(|(i, x)| x.clone() - shorter.coeffs.get(i).unwrap_or(&FFieldUnit::zero()).clone())
+            .collect();
 
-        let mut result = longer.coeffs.clone();
-        for (i, coef) in shorter.coeffs.iter().enumerate() {
-            result[i] = result[i].clone() - coef.clone();
-        }
         Self::new(result, &self.var)
     }
 }
@@ -264,30 +267,80 @@ pub fn prod(vals: &[FFPoly], var: &str) -> FFPoly {
 mod tests {
     use super::*;
 
+    fn get_ffunits_in_range(s: i128, e: i128) -> Vec<FFieldUnit> {
+        (s..e).into_iter().map(|x| FFieldUnit::new(x)).collect()
+    }
+
+    fn get_instance_in_range(s: i128, e: i128) -> FFPoly {
+        let coeffs: Vec<FFieldUnit> = get_ffunits_in_range(s, e);
+        FFPoly::new(coeffs.clone(), "x")
+    }
+
     #[test]
     fn creates_instance() {
-        let coeffs: Vec<FFieldUnit> = (1..=3).into_iter().map(|x| FFieldUnit::new(x)).collect();
-        let fpoly = FFPoly::new(coeffs.clone(), "x");
+        let fpoly = get_instance_in_range(0, 3);
 
         assert_eq!(fpoly.var, "x");
         assert_eq!(fpoly.coeffs.len(), 3);
-        assert_eq!(fpoly.coeffs, coeffs);
         assert_eq!(
             fpoly.coeffs.into_iter().map(|x| x.0).collect::<Vec<i128>>(),
-            [1, 2, 3]
+            [0, 1, 2]
         );
     }
 
     #[test]
     fn evals_a_poly_on_given_val() {
-        let coeffs: Vec<FFieldUnit> = (1..=3).into_iter().map(|x| FFieldUnit::new(x)).collect();
-        let fpoly = FFPoly::new(coeffs.clone(), "x");
+        let fpoly = get_instance_in_range(1, 4);
 
         let res = fpoly.eval(&FFieldUnit::new(2));
 
-        // poly: 3.x^2 + 2.x + 1
+        // poly: 3.x^2 + 2.x + 0
         // for x = 2,
         // poly = 17
         assert_eq!(res, FFieldUnit::new(17));
+    }
+
+    #[test]
+    fn calculates_monomials() {
+        let units = get_ffunits_in_range(0, 2);
+        assert_eq!(units.len(), 2);
+
+        let mono = FFPoly::monomial(1, FFieldUnit::one(), "x");
+
+        assert_eq!(mono.coeffs.len(), 2);
+        assert_eq!(mono.coeffs, units);
+
+        let mono = FFPoly::monomial(0, FFieldUnit::one(), "x");
+
+        assert_eq!(mono.coeffs.len(), 1);
+        assert_eq!(mono.coeffs[0], units[1]);
+
+        let mono = FFPoly::monomial(0, FFieldUnit::zero(), "x");
+        // because the single item would have been FFUnit::zero() which
+        // is removed by trim_trailing funtion
+        assert_eq!(mono.coeffs.len(), 0);
+    }
+
+    #[test]
+    fn calculates_product_of_monomials() {
+        let units = get_ffunits_in_range(0, 3);
+        assert_eq!(units.len(), 3);
+        let monos: Vec<FFPoly> = units
+            .iter()
+            .map(|unit| {
+                FFPoly::monomial(1, FFieldUnit::one(), "x") - FFPoly::monomial(0, unit.clone(), "x")
+            })
+            .collect();
+        assert_eq!(monos.len(), 3);
+
+        let pd = prod(&monos, "x");
+        let expected = vec![
+            FFieldUnit::new(0),
+            FFieldUnit::new(2),
+            FFieldUnit::new(-3),
+            FFieldUnit::new(1),
+        ];
+        assert_eq!(pd.coeffs.len(), 4);
+        assert_eq!(pd.coeffs, expected);
     }
 }

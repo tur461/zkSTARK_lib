@@ -215,8 +215,15 @@ mod tests {
     fn partial_equality_works() {
         let f1 = FFieldUnit::new(1);
         let f2 = FFieldUnit::new(1);
+        let r = f1 == f2;
 
-        assert_eq!(f1, f2);
+        assert!(r);
+
+        let f1 = FFieldUnit::new(0);
+        let f2 = FFieldUnit::new(0);
+        let r = f1 == f2;
+
+        assert!(r);
     }
 
     #[test]
