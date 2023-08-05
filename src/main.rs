@@ -7,7 +7,7 @@ mod ffield_unit;
 use ffield_unit::FFieldUnit;
 
 mod FFPoly;
-use FFPoly::FFPoly as P;
+use FFPoly::{interpolate_poly, FFPoly as P};
 
 // Calculate large fibonacci numbers.
 fn fib_sq(n: u32) -> FFieldUnit {
@@ -35,7 +35,7 @@ fn fib_sq(n: u32) -> FFieldUnit {
 //}
 
 fn evalute_zk() {
-    let ip: usize = 1023;
+    let ip: usize = 1024;
     let to_find = FFieldUnit::new(2338775057);
     let start = Instant::now();
     let mut j: usize = 2;
@@ -46,7 +46,7 @@ fn evalute_zk() {
     result.push(f0);
     result.push(f1);
 
-    while j < 1021 {
+    while j < 1022 {
         f0 = result[j - 2];
         f1 = result[j - 1];
         result.push((f0 * f0) + (f1 * f1));
@@ -76,17 +76,25 @@ fn evalute_zk() {
     //println!("{:?}", result);
     let g = FFieldUnit::generator();
     println!("g: {:?} {}", g, g.0);
-    let G: Vec<i128> = (0..1024)
+    let G: Vec<FFieldUnit> = (0..1024)
         .into_iter()
-        .map(|n| FFieldUnit::pow(g, n).0)
+        .map(|n| FFieldUnit::pow(g, n))
         .collect();
 
-    println!("Generated: {:?}", G[1021]);
-    println!("Generated: {:?}", G[1022]);
-    println!("Generated: {:?}", G[1023]);
-    let poly = Poly::new(vec![1, 0, 2]);
-    println!("poly: {:?}\npretty: {:?}", poly.eval(2), poly.pretty("x"));
+    // println!("Generated: {:?}", G[1021]);
+    // println!("Generated: {:?}", G[1022]);
+    // println!("Generated: {:?}", G[1023]);
+    //let poly = Poly::new(vec![1, 0, 2]);
+    //println!("poly: {:?}\npretty: {:?}", poly.eval(2), poly.pretty("x"));
     // println!("{:?}", G);
+    let len = G.len();
+    let x_vals = &G[..len - 2];
+    println!("G len {}", len);
+    println!("result len {}", result.len());
+    let poly = interpolate_poly(&G[..len - 2], &result, "x");
+    // println!("G: {:?}", G);
+    println!("poly: {:?}", poly);
+    //assert_eq!(v, FFieldUnit::new(1302089273));
 }
 
 fn main() {
