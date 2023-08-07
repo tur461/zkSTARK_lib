@@ -42,6 +42,10 @@ impl FFieldUnit {
         5i128
     }
 
+    pub fn ffgenerator() -> Self {
+        Self::new(Self::generator_value())
+    }
+
     pub fn generator() -> Self {
         Self::pow(Self::new(Self::generator_value()), 3 * 2_u32.pow(20))
     }
@@ -182,6 +186,12 @@ impl PartialEq<u32> for FFieldUnit {
 impl PartialEq<FFieldUnit> for FFieldUnit {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
+    }
+}
+
+impl ToString for FFieldUnit {
+    fn to_string(&self) -> String {
+        format!("{}", self.0)
     }
 }
 

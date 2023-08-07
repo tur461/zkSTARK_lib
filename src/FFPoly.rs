@@ -263,16 +263,14 @@ pub fn calc_langrange_polys(x_vals: &[FFieldUnit], var: &str) -> Vec<FFPoly> {
         .collect();
     let numerator = prod(&monomials, var);
     for j in 0..len {
-        println!("i: {}", j);
         //let mut denominator = FFieldUnit::one();
-        let denominator = prod_ffunits(
-            &x_vals
-                .iter()
-                .enumerate()
-                .filter(|(i, x)| i != &j)
-                .map(|x| x_vals[j] - x.1.clone())
-                .collect::<Vec<FFieldUnit>>()[..],
-        );
+        let mut v: Vec<FFieldUnit> = Vec::new();
+        for (i, x) in x_vals.iter().enumerate() {
+            if i != j {
+                v.push(x_vals[j].clone() - x.clone());
+            }
+        }
+        let denominator = prod_ffunits(&v);
 
         let (poly, _) = numerator
             .clone()
@@ -288,7 +286,25 @@ pub fn calc_langrange_polys(x_vals: &[FFieldUnit], var: &str) -> Vec<FFPoly> {
 pub fn interpolate_lang_poly(y_vals: &[FFieldUnit], lang_polys: &[FFPoly], var: &str) -> FFPoly {
     let mut poly = FFPoly::new(vec![], var);
     for (j, y_val) in y_vals.iter().enumerate() {
-        println!("i: {}", j);
+        // println!("i: {}", j);
+        poly = poly + lang_polys[j].clone().scalar_mul(y_val);
+    }
+    poly
+}
+
+/// multi threaded version
+/// y_vals: &[FFieldUnit]
+/// lang_polys: &[FFPoly]
+///
+pub fn interpolate_lang_poly_threaded(
+    y_vals: &[FFieldUnit],
+    lang_polys: &[FFPoly],
+    var: &str,
+    jobs: usize,
+) -> FFPoly {
+    let mut poly = FFPoly::new(vec![], var);
+    for (j, y_val) in y_vals.iter().enumerate() {
+        // println!("i: {}", j);
         poly = poly + lang_polys[j].clone().scalar_mul(y_val);
     }
     poly
@@ -469,5 +485,23 @@ mod tests {
     }
 
     #[test]
-    fn test_calculation_of_langranges_polynomials() {}
+    fn test_calculation_of_langranges_polynomials() {
+        let ffunits = get_ffunits_in_range(2, 5);
+        let lng_poly = calc_langrange_polys(&ffunits, "x");
+        //assert_eq!(0, 1, "{:?}", lng_poly);
+    }
+
+    // #[test]
+    // fn test_prod() {
+    //     let ffunits = get_instance_in_range(2, 5);
+    //     let prd = prod(&ffunits, "x");
+    //     assert_eq!(prd, FFieldUnit::new(24));
+    // }
+
+    #[test]
+    fn test_prod_ffunits() {
+        let ffunits = get_ffunits_in_range(2, 5);
+        let prd = prod_ffunits(&ffunits);
+        assert_eq!(prd, FFieldUnit::new(24));
+    }
 }
