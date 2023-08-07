@@ -50,6 +50,8 @@ fn main() {
 mod tests {
     use std::ops::Mul;
 
+    use crate::utils::hash256_str;
+
     use super::*;
     use channel::serialize;
     use sha2::{Digest, Sha256};
@@ -156,5 +158,13 @@ mod tests {
         // now time to evaluate on the Coset
         let f_evals: Vec<FFieldUnit> = eval_domain.iter().map(|ed| f.eval(ed)).collect();
         let serialized = serialize(&f_evals[..]);
+        assert_eq!(
+            "1d357f674c27194715d1440f6a166e30855550cb8cb8efeb72827f6a1bf9b5bb",
+            hash256_str(&serialized.as_bytes())
+        );
+
+        // commitments
+        // using merkle tree
+        //
     }
 }
