@@ -1,3 +1,4 @@
+use crate::ffield_unit::FFieldUnit;
 use sha2::{Digest, Sha256};
 
 pub fn hash256_vec(bytes: &[u8]) -> Vec<u8> {
@@ -21,4 +22,8 @@ pub fn u8_to_hexstr(v: &[u8]) -> String {
         })
         .collect::<Vec<String>>()
         .join("")
+}
+
+pub fn get_ffunits_in_range(s: i128, e: i128) -> Vec<FFieldUnit> {
+    (s..e).into_iter().map(|x| FFieldUnit::new(x)).collect()
 }

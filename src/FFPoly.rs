@@ -123,41 +123,13 @@ impl FFPoly {
 
     pub fn qdiv(&self, other: &Self) -> (Self, Self) {
         Self::div_euclid_recursive(&self.trim_trailing_zeroes(), &other.trim_trailing_zeroes())
-        // let poly1 = self.trim_trailing_zeroes();
-        // let poly2 = other.trim_trailing_zeroes();
-        //
-        // let len1 = poly1.coeffs.len();
-        // let len2 = poly2.coeffs.len();
-        // // println!("len1: {} len2: {}", len1, len2);
-        //
-        // if len1 == 0 {
-        //     return (Self::new(vec![], &self.var), Self::new(vec![], &self.var));
-        // }
-        // let mut rem = poly1.clone();
-        // let mut deg_diff = len1 - len2;
-        // // println!("deg diff: {}", deg_diff);
-        // let mut quotient: Vec<FFieldUnit> = (0..(deg_diff + 1))
-        //     .into_iter()
-        //     .map(|_| FFieldUnit::zero())
-        //     .collect();
-        // let g_msc_inv = poly2.coeffs.last().unwrap().inverse();
-        // // println!("q: {:?}", quotient);
-        //
-        // while deg_diff >= 0 {
-        //     let tmp = g_msc_inv * rem.coeffs.last().unwrap();
-        //     quotient[deg_diff] = quotient[deg_diff] + &tmp;
-        //     let mut last_non_zero = deg_diff - 1;
-        //     for (i, coef) in poly2.coeffs.iter().enumerate() {
-        //         rem.coeffs[i + deg_diff] = rem.coeffs[i + deg_diff] - (tmp * coef);
-        //         if !rem.coeffs[i + deg_diff].is_zero() {
-        //             last_non_zero = i + deg_diff;
-        //         }
-        //     }
-        //     rem = rem.trim_trailing_zeroes();
-        //     deg_diff = last_non_zero - len2;
-        // }
-        // println!("q: {:?}", quotient);
-        // (Self::new(quotient, &self.var).trim_trailing_zeroes(), rem)
+    }
+
+    pub fn gen_linear_term(unit: &FFieldUnit, v: &str) -> Self {
+        Self::new(
+            vec![FFieldUnit::zero() - unit.clone(), FFieldUnit::one()],
+            v,
+        )
     }
 }
 

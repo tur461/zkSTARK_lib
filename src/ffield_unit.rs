@@ -34,6 +34,10 @@ impl FFieldUnit {
         Self(0)
     }
 
+    pub fn inner(&self) -> i128 {
+        self.0
+    }
+
     pub fn is_zero(&self) -> bool {
         self.clone() == Self::zero()
     }
