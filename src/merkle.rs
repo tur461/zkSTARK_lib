@@ -1,5 +1,4 @@
 use crate::{ffield_unit::FFieldUnit, utils::hash256_str};
-use sha2::Sha256;
 use std::collections::HashMap;
 
 #[derive(Clone, Debug)]

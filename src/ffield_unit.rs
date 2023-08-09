@@ -1,21 +1,4 @@
-// use num::integer::Roots;
-// use polynomial::Polynomial as Poly;
-// use std::mem::replace;
-use crate::FFPoly::FFPoly;
 use std::ops::{Add, Div, Mul, Sub};
-// use std::time::Instant;
-
-// pub fn to_u512(n: &str) -> i128 {
-//     i128::from_dec_str(n).unwrap()
-// }
-//
-// pub fn u32_to_u512(n: u32) -> i128 {
-//     to_u512(format!("{}", n).as_str())
-// }
-//
-// pub fn usize_u512(n: usize) -> i128 {
-//     to_u512(format!("{}", n).as_str())
-// }
 
 #[derive(Debug, Copy, Clone)]
 pub struct FFieldUnit(pub i128);
@@ -202,6 +185,7 @@ impl ToString for FFieldUnit {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn creates_an_instance() {
         let ffu = FFieldUnit::new(1);

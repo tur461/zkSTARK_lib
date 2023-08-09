@@ -1,66 +1,16 @@
-use num::integer::Roots;
-use polynomial::Polynomial as Poly;
-use std::mem::replace;
-use std::time::Instant;
-
-mod ffield_unit;
-use ffield_unit::FFieldUnit;
-
-mod FFPoly;
-use FFPoly::{interpolate_poly, FFPoly as P};
-
-mod utils;
-
-mod channel;
-
-mod merkle;
-
-// Calculate large fibonacci numbers.
-fn fib_sq(n: u32) -> FFieldUnit {
-    let mut f0 = FFieldUnit::new(1);
-    let mut f1 = FFieldUnit::new(3141592);
-    for _ in 0..n {
-        let f2 = (f0 * f0) + (f1 * f1);
-        // This is a low cost way of swapping f0 with f1 and f1 with f2.
-        f0 = replace(&mut f1, f2);
-    }
-    f0
-}
-
-//fn is_prime(n: U512) -> bool {
-//    let ubound = n.sqrt();
-//    println!("ubound of {} is {} ", n, ubound);
-//
-//    for d in (2..=ubound).into_iter() {
-//        if n % d == 0 {
-//            return false;
-//        }
-//    }
-//
-//    true
-//}
-
-fn main() {
-    //let mut ip = String::new();
-    //std::io::stdin().read_line(&mut ip).expect("a num");
-    //let ip = ip.trim().parse::<usize>().unwrap();
-    // let p = P::new(coeffs);
-    // println!("Xpns: {}", p.display());
-}
-
 #[cfg(test)]
 mod tests {
-    use std::{i128, ops::Mul};
+    use std::ops::Mul;
+    use std::time::Instant;
 
-    use crate::{channel::Channel, utils::hash256_str};
+    use crate::{
+        channel::{serialize, Channel},
+        ffield_unit::FFieldUnit,
+        merkle::MerkleTree,
+        utils::hash256_str,
+        FFPoly::{interpolate_poly, FFPoly},
+    };
 
-    use super::*;
-    use channel::serialize;
-    use merkle::MerkleTree;
-    use rand;
-    use sha2::{Digest, Sha256};
-    use utils::u8_to_hexstr;
-    use FFPoly::FFPoly;
     fn part_one() -> (
         Vec<FFieldUnit>,
         FFieldUnit,
@@ -285,13 +235,6 @@ mod tests {
         chan.send(&mkt.root());
 
         (cp, cp_ev, mkt, chan, eval_dom)
-    }
-
-    fn get_random_field() -> FFieldUnit {
-        use rand::{thread_rng, Rng};
-        let mut rng = rand::thread_rng();
-        let entropy = rng.gen_range(i128::MIN..i128::MAX);
-        FFieldUnit::new(entropy)
     }
 
     #[test]
